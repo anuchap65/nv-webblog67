@@ -2,7 +2,7 @@
   <div>
     <h1>Edit Blog</h1>
     <form v-on:submit.prevent="editBlog">
-      <p>title: <input type="text" v-model="blog.title" /></p>
+      <p>ชื่อสินค้า : <input type="text" v-model="blog.title" /></p>
       <transition name="fade">
         <div class="thumbnail-pic" v-if="blog.thumbnail != 'null'">
           <img :src="BASE_URL + blog.thumbnail" alt="thumbnail" />
