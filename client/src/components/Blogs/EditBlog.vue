@@ -47,7 +47,7 @@
       </div>
 
       <div class="form-group">
-        <label for="product-price"><strong>ราคา:</strong></label>
+        <label for="product-price" ><strong>ราคา:</strong>  <strong style="margin-left: 5px;">บาท</strong></label>
         <input id="product-price" type="text" v-model="blog.price" class="form-control" />
       </div>
 

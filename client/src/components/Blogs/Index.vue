@@ -14,7 +14,7 @@
                 </div>
             </transition>
 
-            <p><strong>ราคา:</strong> {{ blog.price }}</p>
+            <p><strong>ราคา:</strong> {{ blog.price }} <strong>บาท</strong></p>
 
             <p class="actions">
                 <button class="btn" v-on:click="navigateTo('/blog/' + blog.id)">ดูสินค้า</button>

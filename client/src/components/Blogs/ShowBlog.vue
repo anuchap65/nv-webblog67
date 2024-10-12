@@ -30,7 +30,7 @@
        
         <p>รายละเอียด : {{ blog.detail }}</p>
   
-        <p>ราคา: {{ blog.price }}</p>
+        <p>ราคา: {{ blog.price }} <strong>  บาท</strong></p>
         <p>จำนวน: {{ blog.pnum }} </p>
         
           <button class="btn warning" v-on:click="navigateTo('/blogs')">กลับ</button>
