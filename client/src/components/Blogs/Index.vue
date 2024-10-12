@@ -1,26 +1,23 @@
 <template>
     <div class="container">
-        <h2><center>สินค้าหายากทั้งหมด   ( {{ blogs.length }} )</center></h2>
- 
-        <!-- <p><button class="btn primary" v-on:click="logout">Logout</button></p> -->
+        <h2><center>สินค้าหายากทั้งหมด ( {{ blogs.length }} )</center></h2>
+
         <p><button class="btn success" v-on:click="navigateTo('/blog/create')">เพิ่มสินค้า</button></p>
- 
+
         <div v-for="blog in blogs" v-bind:key="blog.id" class="blog-card">
             <h3><strong>ชื่อสินค้า:</strong> {{ blog.pname }}</h3>
- 
+
             <!-- แสดงรูปภาพ Thumbnail -->
             <transition name="fade">
                 <div class="thumbnail-pic" v-if="blog.thumbnail && blog.thumbnail !== 'null'">
                     <img :src="BASE_URL + blog.thumbnail" alt="Thumbnail" />
                 </div>
             </transition>
- 
-            <!-- <p><strong>รายละเอียด:</strong> {{ blog.detail }}</p> -->
+
             <p><strong>ราคา:</strong> {{ blog.price }}</p>
-            <!-- <p><strong>จำนวน:</strong> {{ blog.pnum }}</p> -->
- 
+
             <p class="actions">
-                <button class ="btn" v-on:click="navigateTo('/blog/' + blog.id)">ดูสินค้า</button>
+                <button class="btn" v-on:click="navigateTo('/blog/' + blog.id)">ดูสินค้า</button>
                 <button class="btn warning" v-on:click="navigateTo('/blog/edit/' + blog.id)">แก้ไขสินค้า</button>
                 <button class="btn danger" v-on:click="deleteBlog(blog)">ลบสินค้า</button>
             </p>
@@ -28,31 +25,37 @@
         </div>
     </div>
 </template>
- 
+
 <script>
 import BlogsService from '@/services/BlogsService'
+
 export default {
-    data () {
+    data() {
         return {
             blogs: [],
             BASE_URL: 'http://localhost:8081/assets/uploads/' // ตั้งค่า BASE_URL ให้ถูกต้อง
         }
     },
-    async created () {
-        this.blogs = (await BlogsService.index()).data
+    async created() {
+        await this.fetchBlogs();
     },
     methods: {
-        logout () {
+        async fetchBlogs() {
+            const response = await BlogsService.index();
+            // จัดเรียง blog ตาม ID จากมากไปน้อย
+            this.blogs = response.data.sort((a, b) => b.id - a.id);
+        },
+        logout() {
             this.$store.dispatch('setToken', null)
             this.$store.dispatch('setBlog', null)
             this.$router.push({
                 name: 'login'
             })
         },
-        navigateTo (route) {
+        navigateTo(route) {
             this.$router.push(route)
         },
-        async deleteBlog (blog) {
+        async deleteBlog(blog) {
             let result = confirm("ต้องการลบสินค้านี้หรือไม่?")
             if (result) {
                 try {
@@ -64,12 +67,12 @@ export default {
             }
         },
         async refreshData() {
-            this.blogs = (await BlogsService.index()).data
+            await this.fetchBlogs(); // เรียกใช้ฟังก์ชัน fetchBlogs เพื่อรีเฟรชข้อมูล
         }
     }
 }
 </script>
- 
+
 <style scoped>
 .container {
     max-width: 800px;
@@ -79,12 +82,12 @@ export default {
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
- 
+
 h2, h4 {
     text-align: center;
     color: #333;
 }
- 
+
 .blog-card {
     background-color: #fff;
     padding: 15px;
@@ -93,12 +96,12 @@ h2, h4 {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
- 
+
 .blog-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
- 
+
 .thumbnail-pic img {
     width: 100%;
     max-width: 200px;
@@ -106,14 +109,14 @@ h2, h4 {
     margin-bottom: 10px;
     border-radius: 4px;
 }
- 
+
 .actions {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-top: 10px;
 }
- 
+
 .btn {
     padding: 8px 16px;
     border: none;
@@ -122,53 +125,53 @@ h2, h4 {
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
- 
+
 .btn.primary {
     background-color: #3498db;
     color: #fff;
 }
- 
+
 .btn.primary:hover {
     background-color: #2980b9;
 }
- 
+
 .btn.success {
     background-color: #2ecc71;
     color: #fff;
 }
- 
+
 .btn.success:hover {
     background-color: #27ae60;
 }
- 
+
 .btn.warning {
     background-color: #f39c12;
     color: #fff;
 }
- 
+
 .btn.warning:hover {
     background-color: #e67e22;
 }
- 
+
 .btn.danger {
     background-color: #e74c3c;
     color: #fff;
 }
- 
+
 .btn.danger:hover {
     background-color: #c0392b;
 }
- 
+
 hr {
     border: none;
     border-top: 1px solid #e0e0e0;
     margin: 20px 0;
 }
- 
+
 .fade-enter-active, .fade-leave-active {
     transition: opacity 0.5s;
 }
- 
+
 .fade-enter, .fade-leave-to /* .fade-leave-active in <2.1.8 */ {
     opacity: 0;
 }

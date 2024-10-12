@@ -312,7 +312,7 @@ ul.pictures li {
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  font-weight: bold;
+  font-weight: bold; 
 }
 
 .btn-submit:hover {

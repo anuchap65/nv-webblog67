@@ -1,62 +1,69 @@
 <template>
-  <div>
-    <h1><center>แก้ไขสินค้า</center></h1>
-    <form v-on:submit.prevent="editBlog">
-      <strong><p>ชื่อสินค้า : <input type="text" v-model="blog.pname" /></p></strong>
-      <strong>thumbnail :</strong>
-      <transition name="fade">
-        <div class="thumbnail-pic" v-if="blog.thumbnail != 'null'">
-          <img :src="BASE_URL + blog.thumbnail" alt="thumbnail" />
-        </div>
-      </transition>
-      <form enctype="multipart/form-data" novalidate>
-        <div class="dropbox">
+  <div class="edit-product">
+    <h1 class="text-center">แก้ไขสินค้า</h1>
+    <form @submit.prevent="editBlog">
+      <div class="form-group">
+        <label for="product-name"><strong>ชื่อสินค้า:</strong></label>
+        <input id="product-name" type="text" v-model="blog.pname" class="form-control" />
+      </div>
+
+      <div class="form-group">
+        <label><strong>Thumbnail:</strong></label>
+        <transition name="fade">
+          <div class="thumbnail-pic" v-if="blog.thumbnail !== 'null'">
+            <img :src="BASE_URL + blog.thumbnail" alt="thumbnail" class="img-thumbnail" />
+          </div>
+        </transition>
+      </div>
+
+      <!-- <div class="form-group">
+        <label><strong>Upload Images:</strong></label>
+        <div class="dropbox" @click="$refs.fileInput.click()">
           <input
             type="file"
+            ref="fileInput"
             multiple
             :name="uploadFieldName"
             :disabled="isSaving"
-            @change="
-              filesChange($event.target.name, $event.target.files);
-              fileCount = $event.target.files.length;
-            "
+            @change="handleFileChange"
             accept="image/*"
             class="input-file"
           />
-          <!-- <p v-if="isInitial || isSuccess"> -->
-          <p v-if="isInitial">
-            Drag your file(s) here to begin<br />
-            or click to browse
-          </p>
+          <p v-if="isInitial">Drag your file(s) here to begin<br>or click to browse</p>
           <p v-if="isSaving">Uploading {{ fileCount }} files...</p>
           <p v-if="isSuccess">Upload Successful.</p>
         </div>
-      </form>
+      </div> -->
+
       <transition-group tag="ul" class="pictures">
-        <li v-for="picture in pictures" v-bind:key="picture.id">
-          <img
-            style="margin-bottom: 5px"
-            :src="BASE_URL + picture.name"
-            alt="picture image"
-          />
-          <br />
-          <!-- <button v-on:click.prevent="useThumbnail(picture.name)">Thumbnail</button> -->
-          <!-- <button v-on:click.prevent="delFile(picture)">Delete</button> -->
+        <li v-for="picture in pictures" :key="picture.id" class="picture-item">
+          <img :src="BASE_URL + picture.name" alt="picture image" class="img-preview" />
         </li>
       </transition-group>
-      <div class="clearfix"></div>
-     
-     <strong><p>รายละเอียด : <input type="text" v-model="blog.detail" /></p></strong> 
 
-      <strong><p>ราคา: <input type="text" v-model="blog.price" /></p></strong>
-      <strong><p>จำนวน: <input type="text" v-model="blog.pnum" /></p></strong>
-      <p>
+      <div class="form-group">
+        <label for="product-detail"><strong>รายละเอียด:</strong></label>
+        <input id="product-detail" type="text" v-model="blog.detail" class="form-control" />
+      </div>
+
+      <div class="form-group">
+        <label for="product-price"><strong>ราคา:</strong></label>
+        <input id="product-price" type="text" v-model="blog.price" class="form-control" />
+      </div>
+
+      <div class="form-group">
+        <label for="product-quantity"><strong>จำนวน:</strong></label>
+        <input id="product-quantity" type="text" v-model="blog.pnum" class="form-control" />
+      </div>
+
+      <div class="button-group">
         <button class="btn success" type="submit">ยืนยัน</button>
-        <button class = "btn" v-on:click="navigateTo('/blogs')">กลับ</button>
-      </p>
+        <button class="btn" @click="navigateTo('/blogs')">กลับ</button>
+      </div>
     </form>
   </div>
 </template>
+
 <script>
 import BlogsService from "@/services/BlogsService";
 import VueCkeditor from "vue-ckeditor2";
@@ -73,7 +80,6 @@ export default {
     return {
       BASE_URL: "http://localhost:8081/assets/uploads/",
       error: null,
-      // uploadedFiles: [],
       uploadError: null,
       currentStatus: null,
       uploadFieldName: "userPhoto",
@@ -124,36 +130,20 @@ export default {
         console.log(err);
       }
     },
-    onBlur(editor) {
-      console.log(editor);
-    },
-    onFocus(editor) {
-      console.log(editor);
-    },
     navigateTo(route) {
-      console.log(route);
       this.$router.push(route);
     },
-    wait(ms) {
-      return (x) => {
-        return new Promise((resolve) => setTimeout(() => resolve(x), ms));
-      };
-    },
     reset() {
-      // reset form to initial state
       this.currentStatus = STATUS_INITIAL;
-      // this.uploadedFiles = []
       this.uploadError = null;
       this.uploadedFileNames = [];
     },
     async save(formData) {
-      // upload data to the server
       try {
         this.currentStatus = STATUS_SAVING;
         await UploadService.upload(formData);
         this.currentStatus = STATUS_SUCCESS;
 
-        // update image uploaded display
         let pictureJSON = [];
         this.uploadedFileNames.forEach((uploadFilename) => {
           let found = false;
@@ -179,23 +169,20 @@ export default {
       }
     },
     filesChange(fieldName, fileList) {
-      // handle file changes
       const formData = new FormData();
       if (!fileList.length) return;
-      // append the files to FormData
+
       Array.from(Array(fileList.length).keys()).map((x) => {
         formData.append(fieldName, fileList[x], fileList[x].name);
         this.uploadedFileNames.push(fileList[x].name);
       });
-      // save it
       this.save(formData);
     },
     clearUploadResult: function () {
       setTimeout(() => this.reset(), 5000);
     },
-    useThumbnail(filename) {
-      console.log(filename);
-      this.blog.thumbnail = filename;
+    handleFileChange(event) {
+      this.filesChange(event.target.name, event.target.files);
     },
   },
   computed: {
@@ -212,114 +199,8 @@ export default {
       return this.currentStatus === STATUS_FAILED;
     },
   },
-  components: {
-    VueCkeditor,
-  },
   async created() {
     this.currentStatus = STATUS_INITIAL;
-    this.config.toolbar = [
-      {
-        name: "document",
-        items: [
-          "Source",
-          "-",
-          "Save",
-          "NewPage",
-          "Preview",
-          "Print",
-          "-",
-          "Templates",
-        ],
-      },
-      {
-        name: "clipboard",
-        items: [
-          "Cut",
-          "Copy",
-          "Paste",
-          "PasteText",
-          "PasteFromWord",
-          "-",
-          "Undo",
-          "Redo",
-        ],
-      },
-      {
-        name: "editing",
-        items: ["Find", "Replace", "-", "SelectAll", "-", "Scayt"],
-      },
-      {
-        name: "forms",
-        items: [
-          "Form",
-          "Checkbox",
-          "Radio",
-          "TextField",
-          "Textarea",
-          "Select",
-          "Button",
-          "ImageButton",
-          "HiddenField",
-        ],
-      },
-      "/",
-      {
-        name: "basicstyles",
-        items: [
-          "Bold",
-          "Italic",
-          "Underline",
-          "Strike",
-          "Subscript",
-          "Superscript",
-          "-",
-          "CopyFormatting",
-          "RemoveFormat",
-        ],
-      },
-      {
-        name: "paragraph",
-        items: [
-          "NumberedList",
-          "BulletedList",
-          "-",
-          "Outdent",
-          "Indent",
-          "-",
-          "Blockquote",
-          "CreateDiv",
-          "-",
-          "JustifyLeft",
-          "JustifyCenter",
-          "JustifyRight",
-          "JustifyBlock",
-          "-",
-          "BidiLtr",
-          "BidiRtl",
-          "Language",
-        ],
-      },
-      { name: "links", items: ["Link", "Unlink", "Anchor"] },
-      {
-        name: "insert",
-        items: [
-          "Image",
-          "Flash",
-          "Table",
-          "HorizontalRule",
-          "Smiley",
-          "SpecialChar",
-          "PageBreak",
-          "Iframe",
-          "InsertPre",
-        ],
-      },
-      "/",
-      { name: "styles", items: ["Styles", "Format", "Font", "FontSize"] },
-      { name: "colors", items: ["TextColor", "BGColor"] },
-      { name: "tools", items: ["Maximize", "ShowBlocks"] },
-      { name: "about", items: ["About"] },
-    ];
 
     try {
       let blogId = this.$route.params.blogId;
@@ -341,19 +222,46 @@ export default {
   },
 };
 </script>
+
 <style scoped>
+.edit-product {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.text-center {
+  text-align: center;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-control {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
 .dropbox {
-  outline: 2px dashed grey; /* the dash box */
+  outline: 2px dashed grey;
   outline-offset: -10px;
   background: lemonchiffon;
   color: dimgray;
   padding: 10px 10px;
-  min-height: 200px; /* minimum height */
+  min-height: 200px;
   position: relative;
   cursor: pointer;
+  text-align: center;
 }
+
 .input-file {
-  opacity: 0; /* invisible but it's there! */
+  opacity: 0;
   width: 100%;
   height: 200px;
   position: absolute;
@@ -361,50 +269,57 @@ export default {
 }
 
 .dropbox:hover {
-  background: khaki; /* when mouse over to the drop zone, change color 
-*/
+  background: khaki;
 }
 
-.dropbox p {
-  font-size: 1.2em;
-  text-align: center;
-  padding: 50px 0;
-}
 ul.pictures {
   list-style: none;
   padding: 0;
   margin: 0;
-  float: left;
-  padding-top: 10px;
-  padding-bottom: 10px;
+  display: flex;
+  flex-wrap: wrap;
 }
+
 ul.pictures li {
-  float: left;
+  margin: 5px;
 }
-ul.pictures li img {
+
+.img-preview {
   max-width: 180px;
-  margin-right: 20px;
+  border-radius: 4px;
 }
-.clearfix {
-  clear: both;
-}
-/* thumbnail */
+
 .thumbnail-pic img {
-  width: 200px;
+  width: 100%;
+  max-width: 200px;
+  border-radius: 4px;
 }
+
+.button-group {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.btn {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
 .btn.success {
-    background-color: #2ecc71;
-    color: #fff;
-}.btn {
-    padding: 8px 16px;
-    border: none;
-    border-radius: 4px;
-    font-size: 14px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+  background-color: #2ecc71;
+  color: #fff;
+}
+
+.btn:hover {
+  opacity: 0.8;
 }
 
 .btn.success:hover {
-    background-color: #27ae60;
+  background-color: #27ae60;
 }
 </style>
