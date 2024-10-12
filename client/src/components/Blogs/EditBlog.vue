@@ -1,8 +1,9 @@
 <template>
   <div>
-    <h1>Edit Blog</h1>
+    <h1><center>แก้ไขสินค้า</center></h1>
     <form v-on:submit.prevent="editBlog">
-      <p>ชื่อสินค้า : <input type="text" v-model="blog.title" /></p>
+      <strong><p>ชื่อสินค้า : <input type="text" v-model="blog.pname" /></p></strong>
+      <strong>thumbnail :</strong>
       <transition name="fade">
         <div class="thumbnail-pic" v-if="blog.thumbnail != 'null'">
           <img :src="BASE_URL + blog.thumbnail" alt="thumbnail" />
@@ -46,18 +47,14 @@
         </li>
       </transition-group>
       <div class="clearfix"></div>
-      <p><strong>content:</strong></p>
-      <vue-ckeditor
-        v-model.lazy="blog.content"
-        :config="config"
-        @blur="onBlur($event)"
-        @focus="onFocus($event)"
-      />
-      <p>category: <input type="text" v-model="blog.category" /></p>
-      <p>status: <input type="text" v-model="blog.status" /></p>
+     
+     <strong><p>รายละเอียด : <input type="text" v-model="blog.detail" /></p></strong> 
+
+      <strong><p>ราคา: <input type="text" v-model="blog.price" /></p></strong>
+      <strong><p>จำนวน: <input type="text" v-model="blog.pnum" /></p></strong>
       <p>
-        <button type="submit">update blog</button>
-        <button v-on:click="navigateTo('/blogs')">กลับ</button>
+        <button class="btn success" type="submit">ยืนยัน</button>
+        <button class = "btn" v-on:click="navigateTo('/blogs')">กลับ</button>
       </p>
     </form>
   </div>
@@ -86,12 +83,12 @@ export default {
       pictures: [],
       pictureIndex: 0,
       blog: {
-        title: "",
+        pname: "",
         thumbnail: "null",
         pictures: "null",
-        content: "",
-        category: "",
-        status: "",
+        detail: "",
+        price: "",
+        pnum: "",
       },
       config: {
         toolbar: [
@@ -396,5 +393,20 @@ ul.pictures li img {
 /* thumbnail */
 .thumbnail-pic img {
   width: 200px;
+}
+.btn.success {
+    background-color: #2ecc71;
+    color: #fff;
+}.btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn.success:hover {
+    background-color: #27ae60;
 }
 </style>

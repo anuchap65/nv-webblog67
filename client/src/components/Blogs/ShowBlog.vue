@@ -1,110 +1,395 @@
 <template>
     <div>
-        <h1>Show Blog</h1>
-        <p>id: {{ blog.id }}</p>
-        <p>title: {{ blog.pname }}</p>
-        <!-- <p>รายละเอียด : {{ blog.content }}</p> -->
+      <h1><center>แสดงรายละเอียด</center></h1>
+      <form v-on:submit.prevent="editBlog">
+        <strong>id:</strong> {{ blog.id }}
+<p></p>
+        <strong>ชื่อสินค้า:</strong> {{ blog.pname }}
+        <p></p>
+        <strong>thumbnail:</strong> 
 
-         <!-- แสดงรูปภาพ Thumbnail -->
-         <transition name="fade">
-                <div class="thumbnail-pic" v-if="blog.thumbnail && blog.thumbnail !== 'null'">
-                    <img :src="BASE_URL + blog.thumbnail" alt="Thumbnail" />
-                </div>
-            </transition>
- 
-        <p>Pictures:</p>
-        <div v-if="blog.pictures && blog.pictures.picture">
-            <div v-for="(picture, index) in blog.pictures" :key="index">
-                <img :src="picture" alt="Blog picture" class="blog-picture" />
-            </div>
-        </div>
-        <p v-else>ไม่พบรูปภาพ</p>
- 
+        <transition name="fade">
+          <div class="thumbnail-pic" v-if="blog.thumbnail != 'null'">
+            <img :src="BASE_URL + blog.thumbnail" alt="thumbnail" />
+          </div>
+        </transition>
+       <p></p><p><p><p><p><p><p><p><p><p><p></p></p></p></p></p></p></p></p></p></p>
+       <strong>picture :</strong><p><p><p><p><p><p><p><p><p><p><p><p><p><p><p><p></p></p></p></p></p></p></p></p></p></p></p></p></p></p></p></p> 
+
+        <transition-group tag="ul" class="pictures">
+          <li v-for="picture in pictures" v-bind:key="picture.id">
+            <img
+              style="margin-bottom: 5px"
+              :src="BASE_URL + picture.name"
+              alt="picture image"
+            />
+            <br />
+          </li>
+        </transition-group>
+        <div class="clearfix"></div>
+       
+        <p>รายละเอียด : {{ blog.detail }}</p>
+  
         <p>ราคา: {{ blog.price }}</p>
-        <p>จำนวน: {{ blog.pnum }}</p>
-        <p>
-            <button v-on:click="navigateTo('/blog/edit/' + blog.id)">แก้ไข blog</button>
-            <button v-on:click="navigateTo('/blogs')">กลับ</button>
-        </p>
+        <p>จำนวน: {{ blog.pnum }} </p>
+        
+          <button class="btn warning" v-on:click="navigateTo('/blogs')">กลับ</button>
+
+        
+      </form>
     </div>
-</template>
-<script>
-    import BlogsService from '@/services/BlogsService'
-    export default {
-        data () {
-            return {
-                blog: null
-            }
-        },
-        async created () {
-            try {
-                let blogId = this.$route.params.blogId
-                this.blog = (await BlogsService.show(blogId)).data
-            } catch (error) {
-                console.log (error)
-            }
-        },
-        methods : {
-            navigateTo (route) {
-                this.$router.push(route)
-            },
-        }
-    }
-</script>
-<style scoped>
-</style><template>
-    <div>
-        <h1>Show Blog</h1>
-        <p>id: {{ blog.id }}</p>
-        <p>title: {{ blog.title }}</p>
-        <p>รายละเอียด : {{ blog.content }}</p>
- 
-        <p>Pictures:</p>
-        <div v-if="blog.pictures && blog.pictures.length">
-            <div v-for="(picture, index) in blog.pictures" :key="index">
-                <img :src="picture" alt="Blog picture" class="blog-picture" />
-            </div>
-        </div>
-        <p v-else>ไม่พบรูปภาพ</p>
- 
-        <p>ราคา: {{ blog.category }}</p>
-        <p>status: {{ blog.status }}</p>
-        <p>
-            <button v-on:click="navigateTo('/blog/edit/' + blog.id)">แก้ไข blog</button>
-            <button v-on:click="navigateTo('/blogs')">กลับ</button>
-        </p>
-    </div>
-</template>
- 
-<script>
-import BlogsService from '@/services/BlogsService';
- 
-export default {
+  </template>
+  <script>
+  import BlogsService from "@/services/BlogsService";
+  import VueCkeditor from "vue-ckeditor2";
+  import UploadService from "../../services/UploadService";
+  
+  const STATUS_INITIAL = 0,
+    STATUS_SAVING = 1,
+    STATUS_SUCCESS = 2,
+    STATUS_FAILED = 3;
+  
+  export default {
+    components: { VueCkeditor },
     data() {
-        return {
-            blog: null
-        };
-    },
-    async created() {
-        try {
-            let blogId = this.$route.params.blogId;
-            this.blog = (await BlogsService.show(blogId)).data;
-        } catch (error) {
-            console.log(error);
-        }
+      return {
+        BASE_URL: "http://localhost:8081/assets/uploads/",
+        error: null,
+        // uploadedFiles: [],
+        uploadError: null,
+        currentStatus: null,
+        uploadFieldName: "userPhoto",
+        uploadedFileNames: [],
+        pictures: [],
+        pictureIndex: 0,
+        blog: {
+          pname: "",
+          thumbnail: "null",
+          pictures: "null",
+          detail: "",
+          price: "",
+          num: "",
+        },
+        config: {
+          toolbar: [
+            ["Bold", "Italic", "Underline", "Strike", "Subscript", "Superscript"],
+          ],
+          height: 300,
+        },
+      };
     },
     methods: {
-        navigateTo(route) {
-            this.$router.push(route);
+      async delFile(material) {
+        let result = confirm("Want to delete?");
+        if (result) {
+          let dataJSON = {
+            filename: material.name,
+          };
+  
+          await UploadService.delete(dataJSON);
+          for (var i = 0; i < this.pictures.length; i++) {
+            if (this.pictures[i].id === material.id) {
+              this.pictures.splice(i, 1);
+              this.materialIndex--;
+              break;
+            }
+          }
+        }
+      },
+      async editBlog() {
+        try {
+          await BlogsService.put(this.blog);
+          this.$router.push({
+            name: "blogs",
+          });
+        } catch (err) {
+          console.log(err);
+        }
+      },
+      onBlur(editor) {
+        console.log(editor);
+      },
+      onFocus(editor) {
+        console.log(editor);
+      },
+      navigateTo(route) {
+        console.log(route);
+        this.$router.push(route);
+      },
+      wait(ms) {
+        return (x) => {
+          return new Promise((resolve) => setTimeout(() => resolve(x), ms));
+        };
+      },
+      reset() {
+        // reset form to initial state
+        this.currentStatus = STATUS_INITIAL;
+        // this.uploadedFiles = []
+        this.uploadError = null;
+        this.uploadedFileNames = [];
+      },
+      async save(formData) {
+        // upload data to the server
+        try {
+          this.currentStatus = STATUS_SAVING;
+          await UploadService.upload(formData);
+          this.currentStatus = STATUS_SUCCESS;
+  
+          // update image uploaded display
+          let pictureJSON = [];
+          this.uploadedFileNames.forEach((uploadFilename) => {
+            let found = false;
+            for (let i = 0; i < this.pictures.length; i++) {
+              if (this.pictures[i].name == uploadFilename) {
+                found = true;
+                break;
+              }
+            }
+            if (!found) {
+              this.pictureIndex++;
+              let pictureJSON = {
+                id: this.pictureIndex,
+                name: uploadFilename,
+              };
+              this.pictures.push(pictureJSON);
+            }
+          });
+          this.clearUploadResult();
+        } catch (error) {
+          console.log(error);
+          this.currentStatus = STATUS_FAILED;
+        }
+      },
+      filesChange(fieldName, fileList) {
+        // handle file changes
+        const formData = new FormData();
+        if (!fileList.length) return;
+        // append the files to FormData
+        Array.from(Array(fileList.length).keys()).map((x) => {
+          formData.append(fieldName, fileList[x], fileList[x].name);
+          this.uploadedFileNames.push(fileList[x].name);
+        });
+        // save it
+        this.save(formData);
+      },
+      clearUploadResult: function () {
+        setTimeout(() => this.reset(), 5000);
+      },
+      useThumbnail(filename) {
+        console.log(filename);
+        this.blog.thumbnail = filename;
+      },
+    },
+    computed: {
+      isInitial() {
+        return this.currentStatus === STATUS_INITIAL;
+      },
+      isSaving() {
+        return this.currentStatus === STATUS_SAVING;
+      },
+      isSuccess() {
+        return this.currentStatus === STATUS_SUCCESS;
+      },
+      isFailed() {
+        return this.currentStatus === STATUS_FAILED;
+      },
+    },
+    components: {
+      VueCkeditor,
+    },
+    async created() {
+      this.currentStatus = STATUS_INITIAL;
+      this.config.toolbar = [
+        {
+          name: "document",
+          items: [
+            "Source",
+            "-",
+            "Save",
+            "NewPage",
+            "Preview",
+            "Print",
+            "-",
+            "Templates",
+          ],
         },
-    }
+        {
+          name: "clipboard",
+          items: [
+            "Cut",
+            "Copy",
+            "Paste",
+            "PasteText",
+            "PasteFromWord",
+            "-",
+            "Undo",
+            "Redo",
+          ],
+        },
+        {
+          name: "editing",
+          items: ["Find", "Replace", "-", "SelectAll", "-", "Scayt"],
+        },
+        {
+          name: "forms",
+          items: [
+            "Form",
+            "Checkbox",
+            "Radio",
+            "TextField",
+            "Textarea",
+            "Select",
+            "Button",
+            "ImageButton",
+            "HiddenField",
+          ],
+        },
+        "/",
+        {
+          name: "basicstyles",
+          items: [
+            "Bold",
+            "Italic",
+            "Underline",
+            "Strike",
+            "Subscript",
+            "Superscript",
+            "-",
+            "CopyFormatting",
+            "RemoveFormat",
+          ],
+        },
+        {
+          name: "paragraph",
+          items: [
+            "NumberedList",
+            "BulletedList",
+            "-",
+            "Outdent",
+            "Indent",
+            "-",
+            "Blockquote",
+            "CreateDiv",
+            "-",
+            "JustifyLeft",
+            "JustifyCenter",
+            "JustifyRight",
+            "JustifyBlock",
+            "-",
+            "BidiLtr",
+            "BidiRtl",
+            "Language",
+          ],
+        },
+        { name: "links", items: ["Link", "Unlink", "Anchor"] },
+        {
+          name: "insert",
+          items: [
+            "Image",
+            "Flash",
+            "Table",
+            "HorizontalRule",
+            "Smiley",
+            "SpecialChar",
+            "PageBreak",
+            "Iframe",
+            "InsertPre",
+          ],
+        },
+        "/",
+        { name: "styles", items: ["Styles", "Format", "Font", "FontSize"] },
+        { name: "colors", items: ["TextColor", "BGColor"] },
+        { name: "tools", items: ["Maximize", "ShowBlocks"] },
+        { name: "about", items: ["About"] },
+      ];
+  
+      try {
+        let blogId = this.$route.params.blogId;
+        this.blog = (await BlogsService.show(blogId)).data;
+        this.pictures = JSON.parse(this.blog.pictures);
+        this.pictureIndex = this.pictures.length;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    async mounted() {
+      try {
+        let blogId = this.$route.params.blogId;
+        this.blog = (await BlogsService.show(blogId)).data;
+        this.pictures = JSON.parse(this.blog.pictures);
+      } catch (error) {
+        console.log(error);
+      }
+    },
+  };
+  </script>
+  <style scoped>
+  .dropbox {
+    outline: 2px dashed grey; /* the dash box */
+    outline-offset: -10px;
+    background: lemonchiffon;
+    color: dimgray;
+    padding: 10px 10px;
+    min-height: 200px; /* minimum height */
+    position: relative;
+    cursor: pointer;
+  }
+  .input-file {
+    opacity: 0; /* invisible but it's there! */
+    width: 100%;
+    height: 200px;
+    position: absolute;
+    cursor: pointer;
+  }
+  
+  .dropbox:hover {
+    background: khaki; /* when mouse over to the drop zone, change color 
+  */
+  }
+  
+  .dropbox p {
+    font-size: 1.2em;
+    text-align: center;
+    padding: 50px 0;
+  }
+  ul.pictures {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    float: left;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+  ul.pictures li {
+    float: left;
+  }
+  ul.pictures li img {
+    max-width: 180px;
+    margin-right: 20px;
+  }
+  .clearfix {
+    clear: both;
+  }
+  /* thumbnail */
+  .thumbnail-pic img {
+    width: 200px;
+  }
+  .btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
 }
-</script>
- 
-<style scoped>
-.blog-picture {
-    max-width: 100%; /* Make the image responsive */
-    height: auto; /* Maintain aspect ratio */
-    margin-bottom: 10px; /* Spacing between images */
+  .btn.warning {
+    background-color: #f39c12;
+    color: #fff;
 }
-</style>
+
+.btn.warning:hover {
+    background-color: #e67e22;
+}
+
+
+  </style>
