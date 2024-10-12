@@ -40,10 +40,8 @@
             alt="picture image"
           />
           <br />
-          <button v-on:click.prevent="useThumbnail(picture.name)">
-            Thumbnail
-          </button>
-          <button v-on:click.prevent="delFile(picture)">Delete</button>
+          <!-- <button v-on:click.prevent="useThumbnail(picture.name)">Thumbnail</button> -->
+          <!-- <button v-on:click.prevent="delFile(picture)">Delete</button> -->
         </li>
       </transition-group>
       <div class="clearfix"></div>
