@@ -1,12 +1,12 @@
 <template>
     <div class="container">
-        <h2>สินค้าหายากทั้งหมด   ( {{ blogs.length }} )</h2>
+        <h2><center>สินค้าหายากทั้งหมด   ( {{ blogs.length }} )</center></h2>
  
         <!-- <p><button class="btn primary" v-on:click="logout">Logout</button></p> -->
         <p><button class="btn success" v-on:click="navigateTo('/blog/create')">เพิ่มสินค้า</button></p>
  
         <div v-for="blog in blogs" v-bind:key="blog.id" class="blog-card">
-            <h3><strong>ชื่อสินค้า:</strong> {{ blog.title }}</h3>
+            <h3><strong>ชื่อสินค้า:</strong> {{ blog.pname }}</h3>
  
             <!-- แสดงรูปภาพ Thumbnail -->
             <transition name="fade">
@@ -15,11 +15,12 @@
                 </div>
             </transition>
  
-            <p><strong>รายละเอียด:</strong> {{ blog.content }}</p>
-            <p><strong>ราคา:</strong> {{ blog.category }}</p>
-            <p><strong>จำนวน:</strong> {{ blog.status }}</p>
+            <p><strong>รายละเอียด:</strong> {{ blog.detail }}</p>
+            <p><strong>ราคา:</strong> {{ blog.price }}</p>
+            <p><strong>จำนวน:</strong> {{ blog.pnum }}</p>
  
             <p class="actions">
+                <button class ="btn" v-on:click="navigateTo('/blog/' + blog.id)">ดูสินค้า</button>
                 <button class="btn warning" v-on:click="navigateTo('/blog/edit/' + blog.id)">แก้ไขสินค้า</button>
                 <button class="btn danger" v-on:click="deleteBlog(blog)">ลบสินค้า</button>
             </p>

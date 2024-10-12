@@ -4,7 +4,7 @@
     <form v-on:submit.prevent="createBlog">
       <p>
         ชื่อสินค้า:
-        <input type="text" v-model="blog.title" />
+        <input type="text" v-model="blog.pname" />
       </p>
       <transition name="fade">
         <div class="thumbnail-pic" v-if="blog.thumbnail !== 'null'">
@@ -51,15 +51,15 @@
   
       <p>
         รายละเอียด :
-        <input type="text" v-model="blog.content" />
+        <input type="text" v-model="blog.detail" />
       </p>
       <p>
         ราคา :
-        <input type="text" v-model="blog.category" />
+        <input type="text" v-model="blog.price" />
       </p>
       <p>
         จำนวน :
-        <input type="text" v-model="blog.status" />
+        <input type="text" v-model="blog.pnum" />
       </p>
       <p>
         <button type="submit">เพิ่มสินค้า</button>
@@ -90,12 +90,12 @@ export default {
       pictures: [],
       pictureIndex: 0,
       blog: {
-        title: "",
+        pname: "",
         thumbnail: "null",
         pictures: "null",
-        content: "",
-        category: "",
-        status: "",
+        detail: "",
+        price: "",
+        pnum: "",
       },
       config: {
         toolbar: [
