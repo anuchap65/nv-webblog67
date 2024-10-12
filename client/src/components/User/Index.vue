@@ -25,7 +25,8 @@
       <p>ไม่มีผู้ใช้งานในระบบ</p>
     </div>
     <div class="action-btn">
-      <button v-on:click="logout" class="btn logout-btn">Logout</button>
+      <!-- แก้ไขจาก Logout เป็น Login -->
+      <button v-on:click="navigateToLogin" class="btn login-btn">Login</button>
     </div>
   </div>
 </template>
@@ -40,17 +41,13 @@ export default {
   },
   async created() {
     try{
-      this.users = (await UsersService.index()).data;
+      let response = await UsersService.index();
+      this.users = response.data.sort((a, b) => b.id - a.id); // เรียง id จากมากไปน้อย
     }catch(err){
       console.log(err);
     }
   },
   methods:{
-    logout(){
-      this.$store.dispatch('setToken', null)
-      this.$store.dispatch('setUser', null)
-      this.$router.push({ name: 'login' });
-    },
     navigateTo(route){
       this.$router.push(route);
     },
@@ -67,10 +64,15 @@ export default {
     },
     async refreshData(){
       try{
-        this.users = (await UsersService.index()).data;
+        let response = await UsersService.index();
+        this.users = response.data.sort((a, b) => b.id - a.id); // เรียง id จากมากไปน้อย
       }catch(err){
         console.log(err);
       }
+    },
+    // แก้ไขฟังก์ชันสำหรับนำไปยังหน้า login
+    navigateToLogin(){
+      this.$router.push({ name: 'login' });
     }
   }
 };
@@ -138,7 +140,7 @@ h1 {
   color: white;
 }
 
-.logout-btn {
+.login-btn {
   background-color: #6c757d;
   color: white;
 }

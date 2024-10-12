@@ -2,7 +2,7 @@
   <div>
     <h1>Show User</h1>
     <p>ID: {{ user.id }} </p>
-    <p>Name: {{ user.id }} </p>
+    <p>Name: {{ user.name }} </p>
     <p>Lastname: {{ user.lastname }} </p>
     <p>Email: {{ user.email }}</p>
     <p>Password: {{ user.password }}</p>

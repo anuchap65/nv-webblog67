@@ -4,19 +4,19 @@
     <form v-on:submit.prevent="createUser" class="user-form">
       <div class="form-group">
         <label for="name">Name:</label>
-        <input type="text" id="name" v-model="user.name" placeholder="Enter your first name">
+        <input type="text" id="name" v-model="user.name" placeholder="Enter your first name" required>
       </div>
       <div class="form-group">
         <label for="lastname">Last Name:</label>
-        <input type="text" id="lastname" v-model="user.lastname" placeholder="Enter your last name">
+        <input type="text" id="lastname" v-model="user.lastname" placeholder="Enter your last name" required>
       </div>
       <div class="form-group"> 
         <label for="email">Email:</label> 
-        <input type="email" id="email" v-model="user.email" placeholder="Enter your email address">
+        <input type="email" id="email" v-model="user.email" placeholder="Enter your email address" required>
       </div>
       <div class="form-group">
         <label for="password">Password:</label>
-        <input type="password" id="password" v-model="user.password" placeholder="Enter your password">
+        <input type="password" id="password" v-model="user.password" placeholder="Enter your password" required>
       </div>
       <div class="form-group">
         <button type="submit" class="submit-btn">Create User</button>

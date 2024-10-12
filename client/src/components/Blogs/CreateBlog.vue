@@ -54,12 +54,12 @@
       
       <div class="form-group">
         <label for="detail">รายละเอียด:</label>
-        <input type="text" id="detail" v-model="blog.detail" />
+        <input type="text" id="detail" v-model="blog.detail" required/>
       </div>
 
       <div class="form-group">
         <label for="price">ราคา:                                    <strong style="margin-left: 50px;">บาท</strong></label>
-        <input type="text" id="price" v-model="blog.price" />
+        <input type="text" id="price" v-model="blog.price" required/>
       </div>
 
       <div class="form-group">
